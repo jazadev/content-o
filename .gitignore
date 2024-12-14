@@ -1,0 +1,12 @@
+venv
+venvbicloud
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.env
+.env_prod
+tutelas-classificator
+
+# IDES
+.idea/
+.vscode/
