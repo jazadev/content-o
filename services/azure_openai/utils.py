@@ -4,14 +4,14 @@ import json
 from datetime import datetime, timedelta
 
 def get_prompt(role):
-    prompt_path = f"services/azure_openia/prompts/{role}.txt"
+    prompt_path = f"services/azure_openai/prompts/{role}.txt"
     with open(prompt_path, 'r', encoding="utf-8") as file:
         rfile = file.read()
     return rfile
 
 
 def get_tools(role):
-    prompt_path = f"services/azure_openia/tools/{role}.json"
+    prompt_path = f"services/azure_openai/tools/{role}.json"
     with open(prompt_path, 'r', encoding="utf-8") as file:
         rfile = file.read()
     return [convert_to_json(rfile), ]

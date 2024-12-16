@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Content-O Chat</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <div class="container">
+        <div id="chat-container">
+            <div id="chat-messages"></div>
+            <div class="input-area">
+                <input type="text" id="message-input" placeholder="Type your message...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+        <button onclick="window.location.href='/login'" class="login-btn">Are you a member? Log in</button>
+    </div>
+    <script src="static/chat.js"></script>
+</body>
+</html>
