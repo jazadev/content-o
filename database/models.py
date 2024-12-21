@@ -17,10 +17,6 @@ class Student(db.Model):
     email = Column(String(50))
     grade = Column(String(2))
     
-    # inscriptions = relationship("Inscription", back_populates="student")
-    # charges = relationship("Charge", back_populates="student")
-    # attendances = relationship("Attendance", back_populates="student")
-    # marks = relationship("Mark", back_populates="student")
 
 # Tabla de Profesores
 class Teacher(db.Model):
@@ -34,8 +30,6 @@ class Teacher(db.Model):
     telephone = Column(String(16))
     mayor = Column(String(50))
     
-    # courses = relationship("Course", back_populates="teacher")
-    # teachers_payments = relationship("TeacherPayment", back_populates="teacher")
 
 # Tabla de Cursos
 class Course(db.Model):
@@ -51,13 +45,6 @@ class Course(db.Model):
     modality = Column(String(20))
     class_room = Column(String(20))
     
-    # teacher = relationship("Teacher", back_populates="courses")
-    # inscriptions = relationship("Inscription", back_populates="course")
-    # marks = relationship("Marks", back_populates="course")
-    # attendances = relationship("Attendance", back_populates="course")
-    # course_expenses = relationship("CourseExpense", back_populates="course")
-    # charges = relationship("Charge", back_populates="course")
-    # teachers_payments = relationship("TeacherPayment", back_populates="course")
 
 # Tabla de Inscripciones
 class Inscription(db.Model):
@@ -68,8 +55,6 @@ class Inscription(db.Model):
     course_id = Column(Integer, ForeignKey('courses.id'))
     date = Column(Date)
     
-    # student = relationship("Student", back_populates="inscriptions")
-    # course = relationship("Course", back_populates="inscriptions")
 
 # Tabla de Calificaciones
 class Mark(db.Model):
@@ -81,8 +66,6 @@ class Mark(db.Model):
     mark = Column(DECIMAL(5,2))
     date = Column(Date)
     
-    # student = relationship("Student", back_populates="marks")
-    # course = relationship("Course", back_populates="marks")
 
 # Tabla de Asistencias
 class Attendance(db.Model):
@@ -94,8 +77,6 @@ class Attendance(db.Model):
     date = Column(Date)
     attendant = Column(Boolean)
     
-    # student = relationship("Student", back_populates="attendances")
-    # course = relationship("Course", back_populates="attendances")
 
 # Tabla de Cobros
 class Charge(db.Model):
@@ -109,8 +90,6 @@ class Charge(db.Model):
     charge_date = Column(Date, nullable=False)
     charge_method = Column(String(50))
     
-    # student = relationship("Student", back_populates="charges")
-    # course = relationship("Course", back_populates="charges")
 
 # Tabla de Pagos a Profesores
 class TeacherPayment(db.Model):
@@ -122,8 +101,6 @@ class TeacherPayment(db.Model):
     course_id = Column(Integer, ForeignKey('courses.id'))
     amount = Column(DECIMAL(10,2), nullable=False)
     
-    # teacher = relationship("Teacher", back_populates="teachers_payments")
-    # course = relationship("Course", back_populates="teachers_payments")
 
 # Tabla de Gastos por ejecución de Cursos
 class CourseExpense(db.Model):
@@ -134,4 +111,3 @@ class CourseExpense(db.Model):
     description = Column(String(255), nullable=False)
     amount = Column(DECIMAL(10,2), nullable=False)
     
-    # course = relationship("Course", back_populates="course_expenses")
