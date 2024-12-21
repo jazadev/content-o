@@ -6,7 +6,7 @@ Asistente de Chat Inteligente con Azure OpenAI
 🌟 Características Principales
 ⚡ Dos Niveles de Acceso
 Chat Público: Consultas generales sobre cursos
-Chat Premium: Funcionalidades exclusivas para miembros
+Chat Miembros: Funcionalidades exclusivas para miembros
 🔐 Seguridad
 Autenticación mediante Microsoft Azure AD
 JWT Token validation
