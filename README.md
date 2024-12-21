@@ -21,10 +21,10 @@ Cloud: Azure OpenAI, Azure AD, Azure Monitor
 
 🚀 Configuración
 Configura las variables de entorno:
-```AZURE_CLIENT_ID=your_client_id```
-```TENANT_ID=your_tenant_id```
-```TENANT_ID=your_tenant_id```
-```AZURE_OPENAI_API_KEY=your_api_key```
+```AZURE_CLIENT_ID=your_client_id
+   TENANT_ID=your_tenant_id
+   TENANT_ID=your_tenant_id
+  AZURE_OPENAI_API_KEY=your_api_key```
 
 
 Inicia la aplicación:
