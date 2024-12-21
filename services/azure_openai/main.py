@@ -1,30 +1,51 @@
 import json
 import datetime
 from functools import wraps
-
-#import openai
+from azure.ai.contentsafety import ContentSafetyClient
+from azure.ai.contentsafety.models import AnalyzeTextOptions
+from azure.core.credentials import AzureKeyCredential
+import os
+import logging
+from urllib.parse import quote_plus
+from langchain_community.chat_models import AzureChatOpenAI
+from langchain_community.agent_toolkits.sql.base import create_sql_agent
+from langchain_community.utilities import SQLDatabase
+from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
+from sqlalchemy import create_engine
+#import openai get_prompt
 from openai import AzureOpenAI  # New import style
-
+from services.azure_aisearch.search import handle_user_query
+from services.azure_content_safety.content_safety import validate_with_content_safety, Action
 from tenacity import retry, wait_random_exponential, stop_after_attempt
-from services.azure_openai.utils import read_csv, parse_json_safely
-#from settings.config import AZURE_STORAGE_ACCOUNT_CONNECTION_STRING, AZURE_STORAGE_CONTAINER_DATA_NAME, AZURE_STORAGE_CSV
-#from services.azure_storage import StorageAccount
+from services.azure_openai.utils import is_query_allowed
 from langchain_openai import AzureChatOpenAI
-
 from settings.config import (
     AZURE_OPENAI_API_BASE,
     AZURE_OPENAI_API_KEY,
     AZURE_OPENAI_API_VERSION,
+    CONTENT_SAFETY_ENDPOINT,
+    CONTENT_SAFETY_KEY
 )
 from services.azure_openai.utils import (
     get_prompt,
-    get_tools,
     get_usage_tokens,
 )
+endpoint = CONTENT_SAFETY_ENDPOINT
+subscription_key = CONTENT_SAFETY_KEY
+api_version = "2024-09-01"
+OPENAI_API_KEY = os.environ.get("AZURE_OPENAI_API_KEY")
+AZURE_OPENAI_ENDPOINT = os.environ.get("AZURE_OPENAI_API_BASE")
+AZURE_DEPLOYMENT_NAME = "gpt-4o-mini"
+AZURE_OPENAI_API_VERSION = os.environ.get("AZURE_OPENAI_API_VERSION")
 
-
+# Configuración de la conexión a Azure SQL
+SERVER = os.environ.get("SERVER")
+DATABASE = os.environ.get("DATABASE")
+USERNAME = os.environ.get("USERNAME")
+PASSWORD = os.environ.get("PASSWORD")
 ENGINE_MODEL_VERSION = "gpt-4o-mini"
 
+connection_string = f"mssql+pyodbc://{quote_plus(USERNAME)}:{quote_plus(PASSWORD)}@{SERVER}/{DATABASE}?driver=ODBC+Driver+18+for+SQL+Server&connect_timeout=30&connection_timeout=30"
 
 def measure_time(stage_name):
     def decorator(func):
@@ -58,7 +79,7 @@ class ChatGPTService:
         """Initialize conversation with role-specific system prompt"""
         self.current_role = role
         if role != None:
-            prompt = get_prompt(role)
+            prompt = get_prompt(role.strip())
         else:
             prompt = get_prompt("external-user")
         self.conversation_history = [
@@ -66,8 +87,9 @@ class ChatGPTService:
         ]
 
     @retry(wait=wait_random_exponential(min=2, max=60), stop=stop_after_attempt(3), reraise=True)
-    def run_query_chatgpt(self, query, role=None):
+    def run_query_chatgpt(self, query, source, role=None):
         try:
+            
             # If role changes or conversation not started, initialize with new role
             if role != self.current_role or not self.conversation_history:
                 self.start_conversation(role)
@@ -75,10 +97,10 @@ class ChatGPTService:
             #tools = get_tools(role)
             engine_version = "gpt-4o-mini"
 
-           
+            prompt = source +'/n'+ 'Pregunta: ' + query 
 
-             # Add user message while maintaining the system prompt
-            self.conversation_history.append({"role": "user", "content": query})
+            # Add user message while maintaining the system prompt
+            self.conversation_history.append({"role": "user", "content": prompt})
 
 
 
@@ -87,8 +109,7 @@ class ChatGPTService:
                 messages=self.conversation_history,
                 temperature=0,
                 max_tokens=3000,
-                top_p=0.9,
-                #tool_choice="auto",
+                top_p=0.9
             )
 
             assistant_message = completion.choices[0].message
@@ -100,8 +121,6 @@ class ChatGPTService:
             print(assistant_message.content)
 
 
-
-
             token_consumed = {role: get_usage_tokens(completion)}
             self.stage_token_usage.append(token_consumed)
         except Exception as e:
@@ -111,138 +130,39 @@ class ChatGPTService:
 
         return completion
 
-    @measure_time("identifier")
-    def get_identifier(self, files, subject, content, origin_date):
-        options = {
-            "stage": 'identifier',
-        }
 
-        engine_version = ENGINE_MODEL_VERSION
-
-        response_list = []
-
-        if len(files) == 0:
-            file_txt = 'Asunto del correo: ' + subject + 'Cuerpo:' + content
-            completion = self.run_query_chatgpt(source_text=file_txt, options=options)
-            try:
-                message = completion.choices[0].message
-                tool_calls = message.tool_calls
-                result = tool_calls[0].function.arguments
-
-                result = json.loads(result) if isinstance(result, str) else result
-
-                result['attachments']=False
-                result['with_term']=False
-
-                response_list.append(result)
-
-            except Exception as e:
-                print(f'Error stage identifier. Detail: {e}')
-                raise
-
-
-
-        #response_list = []
-        for file_path in files:
-            with open(file_path, 'r', encoding="utf-8") as f:
-                file_txt = f.read()
-                file_txt = 'Asunto del correo: ' + subject +'  '+ file_txt 
-
-            if len(file_txt) == 0:
-                file_txt = 'Asunto del correo: ' + subject + 'Cuerpo:' + content
-
-            completion = self.run_query_chatgpt(source_text=file_txt, options=options)
-
-            try:
-                #message = completion["choices"][0]["message"]
-                #tool_calls = message["tool_calls"]
-                message = completion.choices[0].message
-                tool_calls = message.tool_calls
-
-                #result=tool_calls[0]["function"]["arguments"]
-                result = tool_calls[0].function.arguments
-
-                result = json.loads(result) if isinstance(result, str) else result
-
-                #response_list.append(tool_calls[0]["function"]["arguments"])
-                response_list.append(result)
-
-            except Exception as e:
-                print(f'Error stage identifier. Detail: {e}')
-                continue
-        return response_list
-    
-    @measure_time("regional")
-    def get_region(self, jurisdiccion):
-        options = {
-            "stage": 'regional',
-        }
-        csv_key = AZURE_STORAGE_CSV
-
-        # Se accede al archivo CSV con la data puntual que necesitamos consultar para obtener el dato que necesitamos
-        store_service_csv = StorageAccount(AZURE_STORAGE_ACCOUNT_CONNECTION_STRING, AZURE_STORAGE_CONTAINER_DATA_NAME)
-        data_csv = store_service_csv.get_data_csv(blob=csv_key)
-
-        
-        header, data = read_csv(data_csv)
-        #key_data=search_word(jurisdiccion, header, data)
-
-        completion = self.run_query_chatgpt(source_text=str(header), options=options)
-        try:
-            message =  completion.choices[0].message
-            tool_calls = message.tool_calls
-            arguments = json.loads(tool_calls[0].function.arguments)
-            return arguments["regional"].upper()
-        except Exception as e:
-            print(f'Error stage regional. Detail: {e}')
-            raise
-       
-
-    @measure_time("important_feature")
-    def get_extract_important_feature(self, source_txt, stage):
-        options = {
-            "stage": stage,
-        }
-
-        completion = self.run_query_chatgpt(source_txt, options)
-        tool_calls = completion.choices[0].message.tool_calls
-        arguments = tool_calls[0].function.arguments
-        return arguments
-    
-    @measure_time("classification")
-    def get_classification(self, important_feature):
-        options = {
-            "stage": 'classification',
-        }
-        completion = self.run_query_chatgpt(source_text=important_feature, options=options)
-        tool_calls = completion["choices"][0]["message"]["tool_calls"]
-        return tool_calls[0]["function"]["arguments"]
-
-    def stage_based_on_process(self, answer):
-        proceso = answer.get("proceso")
-        process_function_map = {
-            "Otro": "extract_eif_written",
-            "Proceso completo es Escrito de tutela": "extract_eif_written",
-            "Proceso completo es Admision": "extract_eif_admision",
-            "Proceso completo es Fallo": "extract_eif_fallo",
-            "Proceso completo es Incidente": "extract_important_feature"
-        }
-        function_to_call = process_function_map.get(proceso, "extract_important_feature")
-        return function_to_call
-
-    def get_engine_version(self, stage):
-        #engine_version = self.stages_engine_version.get(stage)
-        stage_key = str(stage) if not isinstance(stage, str) else stage
-        engine_version = self.stages_engine_version.get(stage_key)
-        return ENGINE_MODEL_VERSION.get(engine_version, ENGINE_MODEL_VERSION)
 
     def process(self, role, query):
         try:
-
-            #filter_documents = [doc for doc in file_source_list if doc.endswith('.pdf.txt')]
-            #file_source_list = filter_documents if len(filter_documents) > 0 else []
-
-            response_data = self.run_query_chatgpt(query=query, role=role)
+            engine = create_engine(connection_string)
+            db = SQLDatabase(engine)
+            print("Conexión a la base de datos exitosa")
+            
+            llm = AzureChatOpenAI(
+                api_key=OPENAI_API_KEY,
+                azure_endpoint=AZURE_OPENAI_ENDPOINT,
+                deployment_name=AZURE_DEPLOYMENT_NAME,
+                api_version=AZURE_OPENAI_API_VERSION,
+                model_name="gpt-4o-mini"
+            )
+            
+            # Crea un agente para consultas SQL
+            toolkit = SQLDatabaseToolkit(db=db, llm=llm)
+            
+            agent = create_sql_agent(
+                llm=llm,
+                toolkit=toolkit,
+                verbose=True,
+            )
+            
+            if validate_with_content_safety(query, endpoint, subscription_key, api_version,).suggested_action == Action.Reject:
+                response_data= "Consulta denegada: el contenido de entrada es inapropiado."
+            elif not is_query_allowed(query, role):
+                response_data= f"Permiso denegado: el rol '{role}' no tiene acceso a esta consulta."
+            else:
+                response = agent.run(query)
+                #documents = handle_user_query(query)
+                response_data = self.run_query_chatgpt(query=query, source=response, role=role)
             
             print(response_data)
 
@@ -257,7 +177,7 @@ class ChatGPTService:
             messages = {
                 "stage_duration": self.stage_duration,
                 "stage_token_usage": self.stage_token_usage,
-                "role": role,
+                "role": role.strip(),
                 "response_data": response_data,
             }
         except Exception as e:
@@ -271,16 +191,12 @@ class ChatGPTService:
     def process_anon(self, query):
         try:
 
-            #filter_documents = [doc for doc in file_source_list if doc.endswith('.pdf.txt')]
-            #file_source_list = filter_documents if len(filter_documents) > 0 else []
+            documents = handle_user_query(query)
 
-            response_data = self.run_query_chatgpt(query=query)
+            response_data = self.run_query_chatgpt(query=query, source=documents)
             
             print(response_data)
 
-
-        #except openai.error.InvalidRequestError as e:
-        #   return {"error": "Maximum token length exceeded. Please reduce the length of the input text."}
         except Exception as e:
             print(f"Error processing the request. Detail: {e}")
             return {"error": f"Error processing the request {e}"}
