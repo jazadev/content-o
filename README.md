@@ -6,6 +6,8 @@ Es una solución empresarial de búsqueda y filtrado de contenido que ayuda y pe
 
 Estas surgen en 2 vertientes: El usuario común como lo es cualquiera de nosotros en donde la vida cotidiana nos presenta obstáculos para obtener información o un simple dato, gasto en ocasiones de un tiempo excesivo que seria aprovechado en otras actividades. La otra son las empresas que muestran un fuerte interés en ofrecer un mejor servicio de acceso a su información con una visión cercana al cliente, segura y que en como objetivo estratégico se genere un círculo virtuoso para que también sea beneficiada la operación y obtención de información para los miembros de la organización y participar de ello a los asociados de negocio.
 
+[Video - presentación](https://drive.google.com/file/d/1bsSm6RCno-iQ-roCsSzyvGF0aKngflwm/view?usp=sharing)
+
 Para ello utilizamos, aprovechamos y consideramos lo siguiente:
 
 🌟 ***Características Principales***
@@ -75,8 +77,6 @@ python app.py
 - Métricas de rendimiento
 - Logs de actividad
 
-**Presentación**
-https://drive.google.com/file/d/1bsSm6RCno-iQ-roCsSzyvGF0aKngflwm/view?usp=sharing
 
 🤝 **Contribuciones**
 
