@@ -16,28 +16,19 @@ Backend: Flask (Python)
 Frontend: JavaScript, HTML5, CSS3
 Cloud: Azure OpenAI, Azure AD, Azure Monitor
 📋 Requisitos Previos
-python -m pip install -r requirements.txt
+```python -m pip install -r requirements.txt```
 
-Copy
-
-Execute
 
 🚀 Configuración
 Configura las variables de entorno:
-AZURE_CLIENT_ID=your_client_id
+```AZURE_CLIENT_ID=your_client_id
 TENANT_ID=your_tenant_id
-AZURE_OPENAI_API_KEY=your_api_key
+TENANT_ID=your_tenant_id
+AZURE_OPENAI_API_KEY=your_api_key```
 
-Copy
-
-Execute
 
 Inicia la aplicación:
-python app.py
-
-Copy
-
-Execute
+```python app.py```
 
 💡 Características Avanzadas
 Renderizado de Markdown
