@@ -57,9 +57,9 @@ python app.py
 
 🔍 **Endpoints API**
 
-- /content-o-courses: Acceso público
-- /content-o-members: Acceso autenticado
-- /login/microsoft: Autenticación Azure AD
+- ```/content-o-courses```: Acceso público
+- ```/content-o-members```: Acceso autenticado
+- ```/login/microsoft```: Autenticación Azure AD
  
 
 📊 **Monitoreo**
