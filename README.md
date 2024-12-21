@@ -62,13 +62,14 @@ python app.py
 - ```/login/microsoft```: Autenticación Azure AD
  
 
+
 📊 **Monitoreo**
 
 - Tracking de uso de tokens
 - Métricas de rendimiento
 - Logs de actividad
 
-- 
+
 
 🤝 **Contribuciones**
 
