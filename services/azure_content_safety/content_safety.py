@@ -8,7 +8,7 @@ import logging
 import os
 
 load_dotenv()
-endpoint = TENANT_ID = os.environ.get("CONTENT_SAFETY_ENDPOINT")
+endpoint = os.environ.get("CONTENT_SAFETY_ENDPOINT")
 subscription_key = os.environ.get("CONTENT_SAFETY_KEY")
 api_version = "2024-09-01"
 
