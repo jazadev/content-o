@@ -2,6 +2,7 @@
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
+    font-family: sans-serif;
 }
 
 #chat-container {
@@ -22,16 +23,19 @@
     margin: 10px 0;
     padding: 10px;
     border-radius: 5px;
+    font-family: sans-serif;
 }
 
 .user-message {
     background-color: #e3f2fd;
     margin-left: 20%;
+    font-family: sans-serif;
 }
 
 .bot-message {
     background-color: #f5f5f5;
     margin-right: 20%;
+    font-family: sans-serif;
 }
 
 .input-area {

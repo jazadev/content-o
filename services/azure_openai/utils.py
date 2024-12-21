@@ -10,11 +10,31 @@ def get_prompt(role):
     return rfile
 
 
-def get_tools(role):
-    prompt_path = f"services/azure_openai/tools/{role}.json"
-    with open(prompt_path, 'r', encoding="utf-8") as file:
-        rfile = file.read()
-    return [convert_to_json(rfile), ]
+# Definición de roles y restricciones
+
+def is_query_allowed(question, role):
+    """
+    Verifica si la consulta está permitida según el rol del usuario.
+
+    Args:
+        question (str): La consulta del usuario.
+        role (str): El rol del usuario.
+
+    Returns:
+        bool: True si la consulta está permitida, False si no.
+    """
+    ROLE_PERMISSIONS = {
+    "SG-Students": ["students", "courses"],  # Tablas accesibles por estudiantes
+    "SG-Finances": ["teachers_payments", "inscriptions", "charges"],  # Tablas accesibles por finanzas
+    "SG-Academic": ["students", "marks", "attendances", "inscriptions"],
+    "SG-Sales-Marketing": ["teachers_payments"],
+    "external-users": ["courses"]
+}
+    allowed_tables = ROLE_PERMISSIONS.get(role, [])
+    for table in allowed_tables:
+        if table in question.lower():
+            return True
+    return False
 
 
 def clean_data(data):

@@ -21,11 +21,19 @@ function sendMessage() {
     .catch(error => console.error('Error:', error));
 }
 
+
+
 function addMessage(type, content) {
     const messagesDiv = document.getElementById('chat-messages');
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${type}-message`;
-    messageDiv.textContent = content;
+
+    // Convertir Markdown a HTML usando marked.js
+    const htmlContent = marked(content);
+
+    // Insertar el HTML en el mensaje
+    messageDiv.innerHTML = htmlContent;
+
     messagesDiv.appendChild(messageDiv);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }

@@ -1,4 +1,4 @@
-from flask import jsonify, make_response, redirect, url_for, render_template, send_from_directory
+from flask import jsonify, make_response, render_template, send_from_directory
 import os
 from app.core.routes import routes_core
 from settings.config import create_app

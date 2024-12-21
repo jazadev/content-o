@@ -1,12 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Premium Chat - Content-O</title>
+    <title>Members Chat - Content-O</title>
     <link rel="stylesheet" href="static/style.css">
+    <script src="static/premium.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@3.0.7/marked.min.js"></script>
+    <script>
+        // Add at the beginning of the file, before other scripts
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('id_token');
+            if (!token) {
+                window.location.href = '/login';
+            }
+        });
+    </script>
 </head>
 <body>
     <div class="container">
-        <h2>Premium Chat</h2>
+        <h2>Members Chat</h2>
         <div id="chat-container">
             <div id="chat-messages"></div>
             <div class="input-area">

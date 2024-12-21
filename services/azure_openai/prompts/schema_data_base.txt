@@ -1,0 +1,136 @@
+Tablas y relaciones:
+
+Tabla: students
+Columnas:
+id (Primary Key)
+first_name
+last_name
+birth_day
+address
+telephone
+email
+created_at
+updated_at
+Relaciones:
+Relacionada con marks a través de student_id.
+Relacionada con attendances a través de student_id.
+Relacionada con charges a través de student_id.
+Relacionada con inscriptions a través de student_id.
+
+
+Tabla: marks
+Columnas:
+id (Primary Key)
+student_id (Foreign Key)
+course_id (Foreign Key)
+mark
+date
+created_at
+updated_at
+Relaciones:
+Relacionada con students a través de student_id.
+Relacionada con courses a través de course_id.
+
+Tabla: attendances
+Columnas:
+id (Primary Key)
+student_id (Foreign Key)
+course_id (Foreign Key)
+attended
+created_at
+updated_at
+Relaciones:
+Relacionada con students a través de student_id.
+Relacionada con courses a través de course_id.
+
+Tabla: charges
+Columnas:
+id (Primary Key)
+student_id (Foreign Key)
+charge_type
+course_id (Foreign Key)
+amount
+charge_method
+charge_date
+created_at
+updated_at
+Relaciones:
+Relacionada con students a través de student_id.
+Relacionada con courses a través de course_id.
+
+Tabla: inscriptions
+Columnas:
+id (Primary Key)
+student_id (Foreign Key)
+course_id (Foreign Key)
+date
+created_at
+updated_at
+Relaciones:
+Relacionada con students a través de student_id.
+Relacionada con courses a través de course_id.
+
+Tabla: courses
+Columnas:
+id (Primary Key)
+name
+teacher_id (Foreign Key)
+schedule
+time_schedule
+time_frame
+time_measure
+modality
+class_room
+created_at
+updated_at
+Relaciones:
+Relacionada con teachers a través de teacher_id.
+Relacionada con marks a través de course_id.
+Relacionada con attendances a través de course_id.
+Relacionada con charges a través de course_id.
+Relacionada con inscriptions a través de course_id.
+Relacionada con course_expenses a través de id.
+
+Tabla: teachers
+Columnas:
+id (Primary Key)
+first_name
+last_name
+email
+telephone
+mayor
+created_at
+updated_at
+Relaciones:
+Relacionada con courses a través de id.
+Relacionada con teachers_payments a través de id.
+
+Tabla: course_expenses
+Columnas:
+id (Primary Key)
+course_id (Foreign Key)
+description
+amount
+created_at
+updated_at
+Relaciones:
+Relacionada con courses a través de course_id.
+
+Tabla: teachers_payments
+Columnas:
+id (Primary Key)
+teacher_id (Foreign Key)
+concept
+course_id (Foreign Key)
+amount
+created_at
+updated_at
+Relaciones:
+Relacionada con teachers a través de teacher_id.
+Relacionada con courses a través de course_id.
+
+Tabla: alembic_version
+Columnas:
+version_num
+Relaciones:
+No tiene relaciones con otras tablas.
