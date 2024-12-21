@@ -56,7 +56,7 @@ python app.py
 - Renderizado de Markdown
 - Sistema de roles dinámico
 - Monitoreo en tiempo real
-- Logging integrado con Azure
+- Logging integrado con Azure Entra ID
 
 
 
