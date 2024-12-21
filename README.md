@@ -1,4 +1,9 @@
-#**Content-o** 🤖 - Asistente de Chat Inteligente con Azure OpenAI
+**VIDEO PRESENTACION**
+https://drive.google.com/file/d/1bsSm6RCno-iQ-roCsSzyvGF0aKngflwm/view?usp=sharing
+
+
+**Content-o** 🤖 - Asistente de Chat Inteligente con Azure OpenAI
+
 Es una solución empresarial de búsqueda y filtrado de contenido que ayuda y permite a las organizaciones ya sean del sector financiero, salud, producción o de servicios, ofrecer a sus empleados, asociados y terceros un punto de acceso para recibir información alineada y ajustada al ámbito de su competencia, teniendo especial atención en decantar contenido de carácter sensible, privado o confidencial, todo esto en un entorno moderno y sencillo soportado por inteligencia artificial y Azure Entity ID.
 
 ## Motivaciones
